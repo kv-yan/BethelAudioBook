@@ -15,13 +15,14 @@ val Pink40 = Color(0xFF7D5260)
 val dark_subTitlesBackgroundColor = Color(0xFF110F1D)
 val light_subTitlesBackgroundColor = Color(0xFFFFFFFF)
 
-val lightGradient = Brush.verticalGradient(
+val lightGradient = Brush.linearGradient(
     colors = listOf(
-        Color(0xFFFFF1F8), // Light pink
-        Color(0xFFCDEFF4), // Light blue
+        Color(0xFFFFF1F8),
+        Color(0xFFFFF1F8),
+        Color(0xFFFFF3FF),
+        Color(0xFFB4DAE7)
     )
 )
-
 val darkGradient = Brush.verticalGradient(
     colors = listOf(
         Color(0xFF00102F), // Dark blue
