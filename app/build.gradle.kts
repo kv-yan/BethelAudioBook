@@ -67,7 +67,14 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
 
     implementation(libs.accompanist.systemuicontroller)
-    implementation (libs.accompanist.pager)
-    implementation (libs.accompanist.flowlayout)
+    implementation(libs.accompanist.pager)
+    implementation(libs.accompanist.flowlayout)
+
+    // navigation
+    implementation(libs.androidx.navigation.compose)
+
+    // koin
+    implementation(libs.koin.androidx.compose)
+
 
 }

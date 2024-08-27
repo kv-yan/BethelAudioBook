@@ -14,10 +14,15 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import ru.bethel.book.view_model.MainViewModel
 
 
 @Composable
-fun DrawerLayout(isLightMode: MutableState<Boolean>, isShowingDrawer: MutableState<Boolean>) {
+fun DrawerLayout(
+    mainViewModel: MainViewModel,
+    isLightMode: MutableState<Boolean>,
+    isShowingDrawer: MutableState<Boolean>
+) {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Open)
     val scope = rememberCoroutineScope()
     isShowingDrawer.value = drawerState.isOpen
@@ -35,7 +40,12 @@ fun DrawerLayout(isLightMode: MutableState<Boolean>, isShowingDrawer: MutableSta
                         )
                     )
             ) {
-                DrawerContent(isLightMode = isLightMode, scope = scope, state = drawerState)
+                DrawerContent(
+                    mainViewModel = mainViewModel,
+                    isLightMode = isLightMode,
+                    scope = scope,
+                    state = drawerState
+                )
             }
         },
     ) {

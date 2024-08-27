@@ -18,31 +18,30 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import ru.bethel.domain.model.BookHead
+import ru.bethel.domain.model.Chapter
 
 @Composable
-fun BibleBooksGrid(
-    books: List<BookHead>, isLightMode: MutableState<Boolean>, onBookItemClick: (BookHead) -> Unit
+fun BibleChaptersGrid(
+    chapters: List<Chapter>,
+    isLightMode: MutableState<Boolean>,
+    onChapterItemClick: (Chapter) -> Unit
 ) {
     LazyVerticalGrid(
         columns = GridCells.Fixed(6),
         modifier = Modifier
             .fillMaxWidth()
             .heightIn(0.dp, 1000.dp),
-//        contentPadding = PaddingValues(horizontal = 8.dp),
         horizontalArrangement = Arrangement.spacedBy(1.dp),
         verticalArrangement = Arrangement.spacedBy(1.dp)
     ) {
-        items(books) { book ->
+        items(chapters) { chapter ->
             Box(modifier = Modifier
-                .clickable {
-                    onBookItemClick(book)
-                }
+                .clickable { onChapterItemClick(chapter) }
                 .size(35.dp)
                 .background(if (isLightMode.value) Color(0xFFF3F3F3) else Color(0xFF010101)),
                 contentAlignment = Alignment.Center) {
                 Text(
-                    text = book.title,
+                    text = chapter.title,
                     color = if (isLightMode.value) Color(0xFF1A1A1A) else Color(0xFFFAFAFA),
                     fontSize = 12.sp,
                     modifier = Modifier.align(Alignment.Center)

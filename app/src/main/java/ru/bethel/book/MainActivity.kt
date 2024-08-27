@@ -13,17 +13,20 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import org.koin.androidx.compose.koinViewModel
 import ru.bethel.book.ui.drawer.DrawerLayout
 import ru.bethel.book.ui.theme.darkGradient
 import ru.bethel.book.ui.theme.lightGradient
+import ru.bethel.book.view_model.MainViewModel
 
 class MainActivity : ComponentActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-//        enableEdgeToEdge()
         setContent {
             val isLightMode = remember { mutableStateOf(false) }
             val isShowingDrawer = remember { mutableStateOf(true) }
+            val mainViewModel = koinViewModel<MainViewModel>()
             FullScreenApp(isLightMode = isLightMode, isDrawerOpened = isShowingDrawer)
 
             Box(
@@ -31,7 +34,11 @@ class MainActivity : ComponentActivity() {
                     .fillMaxSize()
                     .background(if (isLightMode.value) lightGradient else darkGradient)
             ) {
-                DrawerLayout(isLightMode = isLightMode, isShowingDrawer)
+                DrawerLayout(
+                    mainViewModel = mainViewModel,
+                    isLightMode = isLightMode,
+                    isShowingDrawer = isShowingDrawer
+                )
             }
         }
     }
