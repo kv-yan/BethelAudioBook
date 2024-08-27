@@ -14,6 +14,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
@@ -52,8 +53,10 @@ fun ImagePager(images: List<Painter>) {
                 scaleY = if (isCurrentPage) 1f else 0.85f
             }) {
             Card(
-                shape = RoundedCornerShape(16.dp), modifier = Modifier.fillMaxWidth()/* // Adjust size to make space for adjacent images
-                    .aspectRatio(1f)*/, // Maintain aspect ratio
+                shape = RoundedCornerShape(16.dp), modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(
+                    containerColor = Color.Transparent, disabledContainerColor = Color.Transparent
+                ),
                 elevation = CardDefaults.elevatedCardElevation(defaultElevation = 4.dp)
             ) {
                 Image(

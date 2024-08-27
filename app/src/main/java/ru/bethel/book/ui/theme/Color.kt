@@ -25,8 +25,8 @@ val lightGradient = Brush.linearGradient(
 )
 val darkGradient = Brush.verticalGradient(
     colors = listOf(
-        Color(0xFF00102F), // Dark blue
-        Color(0xFF000000)  // Black
+        Color(0xFF000000),  // Black
+        Color(0xFF00102F) // Dark blue
     )
 )
 

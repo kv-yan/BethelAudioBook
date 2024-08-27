@@ -14,7 +14,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -35,7 +35,7 @@ fun HomeScreen(isLightMode: MutableState<Boolean>) {
         painterResource(id = R.drawable.ic_chapter),
         painterResource(id = R.drawable.ic_chapter),
     )
-    val currentProgress = remember { mutableStateOf(0.5f) }
+    val currentProgress = remember { mutableFloatStateOf(0.5f) }
     val scrollState = rememberScrollState()
 
     Column(
