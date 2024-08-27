@@ -1,5 +1,9 @@
 package ru.bethel.book.ui.drawer
 
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -52,13 +56,22 @@ fun DrawerContent(
                 )
             }
 
-            composable(DrawerScreen.CHAPTER.route) {
+            composable(
+                DrawerScreen.CHAPTER.route,
+                enterTransition = {
+                    slideInHorizontally(initialOffsetX = { it }) + fadeIn(initialAlpha = 0.3f)
+                },
+                exitTransition = {
+                    slideOutHorizontally(targetOffsetX = { -it }) + fadeOut(targetAlpha = 0.3f)
+                },
+            ) {
                 DrawerChapterScreen(
                     mainViewModel = mainViewModel,
                     navController = chaptersNavController,
                     isLightMode = isLightMode,
                     drawerState = state,
-                    scope = scope, booksUiType = bookUiType
+                    scope = scope,
+                    booksUiType = bookUiType
                 )
             }
         }
