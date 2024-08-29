@@ -23,7 +23,7 @@ fun DrawerLayout(
     isLightMode: MutableState<Boolean>,
     isShowingDrawer: MutableState<Boolean>
 ) {
-    val drawerState = rememberDrawerState(initialValue = DrawerValue.Open)
+    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
     isShowingDrawer.value = drawerState.isOpen
     ModalNavigationDrawer(
@@ -49,7 +49,12 @@ fun DrawerLayout(
             }
         },
     ) {
-        DrawerScreenContent(isLightMode = isLightMode, scope = scope, state = drawerState)
+        DrawerScreenContent(
+            isLightMode = isLightMode,
+            scope = scope,
+            state = drawerState,
+            mainViewModel = mainViewModel
+        )
     }
 }
 

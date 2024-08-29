@@ -15,10 +15,11 @@ import kotlinx.coroutines.launch
 import ru.bethel.book.R
 import ru.bethel.book.ui.actionBar.HomeActionBar
 import ru.bethel.book.ui.screens.HomeScreen
+import ru.bethel.book.view_model.MainViewModel
 
 @Composable
 fun DrawerScreenContent(
-    isLightMode: MutableState<Boolean>, state: DrawerState, scope: CoroutineScope
+    isLightMode: MutableState<Boolean>, state: DrawerState, scope: CoroutineScope , mainViewModel: MainViewModel
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
         Image(modifier = Modifier.fillMaxSize() ,
@@ -39,7 +40,7 @@ fun DrawerScreenContent(
                 isLightMode.value = !isLightMode.value
             }
 
-            HomeScreen(isLightMode = isLightMode)
+            HomeScreen(isLightMode = isLightMode  , mainViewModel = mainViewModel)
 
         }
 

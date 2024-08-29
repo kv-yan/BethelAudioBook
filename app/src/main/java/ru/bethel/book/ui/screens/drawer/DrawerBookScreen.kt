@@ -137,7 +137,7 @@ fun BibleHeader(isLightMode: MutableState<Boolean>, title: String) {
 
 
 @Composable
-private fun DrawerIconsHeader(
+fun DrawerIconsHeader(
     isLightMode: Boolean,
     bookUiType: BooksUiType,
     onUiStateBtnClick: () -> Unit,

@@ -32,6 +32,26 @@ fun DrawerChapterScreen(
     }
     Column {
         val currentBook = mainViewModel.currentBook.value
+        DrawerIconsHeader(isLightMode = isLightMode.value,
+            bookUiType = booksUiType.value,
+            onUiStateBtnClick = {
+                when (booksUiType.value) {
+                    BooksUiType.GRID -> {
+                        booksUiType.value = BooksUiType.COLUMN
+                    }
+
+                    BooksUiType.COLUMN -> {
+                        booksUiType.value = BooksUiType.GRID
+                    }
+                }
+            },
+            onCloseBtnClick = {
+                scope.launch {
+                    drawerState.close()
+                }
+            })
+
+
         BibleHeader(isLightMode = isLightMode, title = currentBook.title)
         when (booksUiType.value) {
             BooksUiType.COLUMN -> {
@@ -40,7 +60,6 @@ fun DrawerChapterScreen(
                 ) {
                     onChapterItemClick(it)
                 }
-
             }
 
             BooksUiType.GRID -> {

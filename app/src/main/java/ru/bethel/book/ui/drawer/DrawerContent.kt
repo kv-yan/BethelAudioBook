@@ -45,7 +45,9 @@ fun DrawerContent(
     ) {
         NavHost(navController = chaptersNavController, startDestination = DrawerScreen.BOOK.route) {
 
-            composable(DrawerScreen.BOOK.route) {
+            composable(route = DrawerScreen.BOOK.route, exitTransition = {
+                slideOutHorizontally(targetOffsetX = { -it }) + fadeOut(targetAlpha = 0.3f)
+            }) {
                 DrawerBookScreen(
                     isLightMode = isLightMode,
                     state = state,
@@ -57,7 +59,7 @@ fun DrawerContent(
             }
 
             composable(
-                DrawerScreen.CHAPTER.route,
+                route = DrawerScreen.CHAPTER.route,
                 enterTransition = {
                     slideInHorizontally(initialOffsetX = { it }) + fadeIn(initialAlpha = 0.3f)
                 },
