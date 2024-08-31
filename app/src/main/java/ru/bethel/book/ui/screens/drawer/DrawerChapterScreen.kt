@@ -52,7 +52,7 @@ fun DrawerChapterScreen(
             })
 
 
-        BibleHeader(isLightMode = isLightMode, title = currentBook.name)
+        BibleHeader(isLightMode = isLightMode, title = currentBook.shortName)
         when (booksUiType.value) {
             BooksUiType.COLUMN -> {
                 BibleChaptersColumn(

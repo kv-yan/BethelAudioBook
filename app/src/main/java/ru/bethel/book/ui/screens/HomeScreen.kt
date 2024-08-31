@@ -27,9 +27,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import ru.bethel.book.R
 import ru.bethel.book.ui.items.ChapterColumnItem
@@ -133,18 +134,25 @@ private fun MainContent(mainViewModel: MainViewModel, isLightMode: MutableState<
 
     val currentChapter = mainViewModel.currentChapter.value
     val currentBook = mainViewModel.currentBook.value
-    val images = mutableListOf<Painter>()
+    val images = currentBook.chapters.map { painterResource(id = R.drawable.ic_chapter) }
+    val chapterTitles = currentBook.chapters.map { "${currentBook.fullName} ${it.shortTitle}" }
 
-    currentBook.chapters.forEach { chapter ->
-        images.add(painterResource(id = R.drawable.ic_chapter))
-    }
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .verticalScroll(state = scrollState)
     ) {
-        ImagePager(images = images)
-
+        ImagePager(
+            images = images,
+            chapterTitles = chapterTitles,
+            currentChapterIndex = currentBook.chapters.indexOf(currentChapter)
+        ) { pageIndex ->
+            if (pageIndex > currentBook.chapters.indexOf(currentChapter)) {
+                mainViewModel.onNextChapter()
+            } else if (pageIndex < currentBook.chapters.indexOf(currentChapter)) {
+                mainViewModel.onPreviousChapter()
+            }
+        }
         Spacer(modifier = Modifier.height(48.dp))
 
         Surface(
@@ -162,11 +170,12 @@ private fun MainContent(mainViewModel: MainViewModel, isLightMode: MutableState<
             ) {
                 item {
                     Text(
-                        text = "${mainViewModel.currentBook.value.name} , ${currentChapter.title} ",
+                        text = "${mainViewModel.currentBook.value.shortName} , ${currentChapter.shortTitle} ",
                         color = if (isLightMode.value) Color(0xFF1A1A1A) else Color(0xFFFAFAFA),
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(bottom = 8.dp)
+                            .padding(bottom = 8.dp),
+                        fontFamily = FontFamily(Font(R.font.montserratarm_regular))
 
                     )
                 }
@@ -195,6 +204,8 @@ private fun MainContent(mainViewModel: MainViewModel, isLightMode: MutableState<
             }
         }
 
+        Spacer(modifier = Modifier.height(45.dp))
+
         ChapterPlayer(mainViewModel,
             player = mainViewModel.mediaPlayer,
             isLightMode = isLightMode,
@@ -215,6 +226,7 @@ private fun MainContent(mainViewModel: MainViewModel, isLightMode: MutableState<
             },
             onNext10SecClick = { mainViewModel.skipForward10Seconds() },
             onPrev10SecClick = { mainViewModel.skipBackward10Seconds() })
+
         Spacer(modifier = Modifier.height(58.dp))
     }
 

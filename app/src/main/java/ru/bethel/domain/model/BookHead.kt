@@ -4,18 +4,18 @@ import android.os.Parcel
 import android.os.Parcelable
 
 data class BookHead(
-    val name: String,
-    val chapters: List<Chapter>,
-    val bookIndex: Int
+    val shortName: String, val fullName: String, val chapters: List<Chapter>, val bookIndex: Int
 ) : Parcelable {
     constructor(parcel: Parcel) : this(
+        parcel.readString() ?: "",
         parcel.readString() ?: "",
         parcel.createTypedArrayList(Chapter.CREATOR) ?: emptyList(),
         parcel.readInt() ?: 0
     )
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
-        parcel.writeString(name)
+        parcel.writeString(fullName)
+        parcel.writeString(shortName)
         parcel.writeTypedList(chapters)
         parcel.writeInt(bookIndex)
     }

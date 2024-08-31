@@ -171,6 +171,9 @@ class MainViewModel : ViewModel() {
     fun seekToPosition(position: Int) {
         mediaPlayer?.seekTo(position)
         currentPosition.floatValue = position.toFloat()
+        if (mediaPlayer?.isPlaying == false) {
+            play()
+        }
     }
 
     override fun onCleared() {
