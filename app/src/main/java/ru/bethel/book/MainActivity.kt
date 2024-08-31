@@ -20,13 +20,17 @@ import ru.bethel.book.ui.theme.lightGradient
 import ru.bethel.book.view_model.MainViewModel
 
 class MainActivity : ComponentActivity() {
+    var mainViewModel: MainViewModel? = null
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+
         setContent {
             val isLightMode = remember { mutableStateOf(false) }
             val isShowingDrawer = remember { mutableStateOf(true) }
-            val mainViewModel = koinViewModel<MainViewModel>()
+            mainViewModel = koinViewModel<MainViewModel>()
             FullScreenApp(isLightMode = isLightMode, isDrawerOpened = isShowingDrawer)
 
             Box(
@@ -35,7 +39,7 @@ class MainActivity : ComponentActivity() {
                     .background(if (isLightMode.value) lightGradient else darkGradient)
             ) {
                 DrawerLayout(
-                    mainViewModel = mainViewModel,
+                    mainViewModel = mainViewModel!!,
                     isLightMode = isLightMode,
                     isShowingDrawer = isShowingDrawer
                 )
@@ -43,6 +47,7 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
+
 
 @Composable
 fun FullScreenApp(isLightMode: MutableState<Boolean>, isDrawerOpened: MutableState<Boolean>) {

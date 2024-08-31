@@ -2,7 +2,6 @@ package ru.bethel.book.ui.screens
 
 
 import android.util.Log
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -105,12 +104,11 @@ fun HomeScreen(isLightMode: MutableState<Boolean>, mainViewModel: MainViewModel)
     val currentChapter by remember { mainViewModel.currentChapter }
     val isLoadedMP3 by remember { mainViewModel.isLoadedMP3 }
 
-    val context = LocalContext.current
     val audioUrl = currentChapter.audioURL
 
     LaunchedEffect(currentChapter) {
         Log.e(TAG, "HomeScreen: audioUrl $audioUrl")
-        mainViewModel.prepareMediaPlayer(context, audioUrl)
+        mainViewModel.prepareMediaPlayer( audioUrl)
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -118,10 +116,7 @@ fun HomeScreen(isLightMode: MutableState<Boolean>, mainViewModel: MainViewModel)
             MainContent(mainViewModel = mainViewModel, isLightMode = isLightMode)
         } else {
             Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(Color.Black.copy(alpha = 0.5f)),
-                contentAlignment = Center
+                modifier = Modifier.fillMaxSize(), contentAlignment = Center
             ) {
                 CircularProgressIndicator(
                     modifier = Modifier.size(45.dp),
@@ -165,7 +160,10 @@ private fun MainContent(mainViewModel: MainViewModel, isLightMode: MutableState<
                     .padding(start = 12.dp, end = 22.dp, top = 19.dp, bottom = 21.dp)
             ) {
                 item {
-                    Text(text = "${mainViewModel.currentBook.value.title} , ${currentChapter.title} ")
+                    Text(
+                        text = "${mainViewModel.currentBook.value.name} , ${currentChapter.title} ",
+                        color = if (isLightMode.value) Color(0xFF1A1A1A) else Color(0xFFFAFAFA)
+                    )
                 }
 
                 itemsIndexed(currentChapter.subTitles) { index, item ->
@@ -176,7 +174,8 @@ private fun MainContent(mainViewModel: MainViewModel, isLightMode: MutableState<
             }
         }
 
-        ChapterPlayer(player = mainViewModel.mediaPlayer,
+        ChapterPlayer(mainViewModel = mainViewModel,
+            player = mainViewModel.mediaPlayer,
             isLightMode = isLightMode,
             currentProgress = mainViewModel.currentPosition,
             isPlaying = mainViewModel.isPlaying,
@@ -187,8 +186,12 @@ private fun MainContent(mainViewModel: MainViewModel, isLightMode: MutableState<
                     mainViewModel.pause()
                 }
             },
-            onNextChapterClick = {},
-            onPrevChapterClick = {},
+            onNextChapterClick = {
+                mainViewModel.onNextChapter()
+            },
+            onPrevChapterClick = {
+                mainViewModel.onPreviousChapter()
+            },
             onNext10SecClick = { mainViewModel.skipForward10Seconds() },
             onPrev10SecClick = { mainViewModel.skipBackward10Seconds() })
         Spacer(modifier = Modifier.height(58.dp))

@@ -37,7 +37,7 @@ fun BibleBooksColumn(books: List<BookHead>, isLightMode: MutableState<Boolean> ,
                     .background(if (isLightMode.value) Color(0xFFF3F3F3) else Color(0xFF010101)),
             ) {
                 Text(
-                    text = book.title,
+                    text = book.name,
                     color = if (isLightMode.value) Color(0xFF1A1A1A) else Color(0xFFFAFAFA),
                     fontSize = 12.sp,
                     modifier = Modifier

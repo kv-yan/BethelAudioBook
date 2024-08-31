@@ -27,7 +27,7 @@ fun ChapterColumnItem(isLightMode: MutableState<Boolean>, isNowPlaying: Boolean)
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 9.dp)
+            .padding(top = 9.dp, bottom = 9.dp, start = 8.dp)
     ) {
         Text(
             text = "1․ Մոգերի երկրպագությունը",

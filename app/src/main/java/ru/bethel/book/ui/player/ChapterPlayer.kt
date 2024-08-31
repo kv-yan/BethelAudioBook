@@ -27,9 +27,11 @@ import ru.bethel.book.ui.theme.lightMinusPlusIconColor
 import ru.bethel.book.ui.theme.lightPrevIconColor
 import ru.bethel.book.ui.theme.playerNotPlayedText
 import ru.bethel.book.ui.theme.playerPlayedText
+import ru.bethel.book.view_model.MainViewModel
 
 @Composable
 fun ChapterPlayer(
+    mainViewModel: MainViewModel,
     player: MediaPlayer?,
     isLightMode: MutableState<Boolean>,
     currentProgress: MutableState<Float>,
@@ -42,7 +44,9 @@ fun ChapterPlayer(
 ) {
     FavoriteSection(isLightMode = isLightMode)
 
-    AudioSlider(isLightMode = isLightMode, currentProgress = currentProgress)
+    AudioSlider(
+        mainViewModel = mainViewModel
+    )
 
     BtnSection(isPlaying = isPlaying,
         isLightMode = isLightMode,

@@ -2,6 +2,7 @@ package ru.bethel.book.ui.player
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -10,7 +11,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.CornerRadius
@@ -18,6 +18,8 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
+import ru.bethel.book.view_model.MainViewModel
+import ru.bethel.domain.model.SubTitle
 
 
 data class Chapter(
@@ -25,12 +27,10 @@ data class Chapter(
 )
 
 @Composable
-private fun AudioBookSlider(
-    isLightMode: Boolean = false,
-    progress: Float = 0.5f,
-    chapters: List<Chapter>,
+fun AudioBookSlider(
+    viewModel: MainViewModel,
+    chapters: List<SubTitle>,
     modifier: Modifier = Modifier,
-    onValueChange: (Float) -> Unit,
     trackColor: Color = Color(0xFFF9F2FA),
     progressColor: Color = Color(0xFF9570FF),
     trackedChapterMarkerColor: Color = Color(0xFF9570FF),
@@ -38,8 +38,11 @@ private fun AudioBookSlider(
     chapterMarkerRadius: Float = 16f,
     trackHeight: Float = 16f,
     thumbRadius: Float = 16f,
-    thumbColor: Color = if (isLightMode) Color(0xFF9570FF) else Color(0xFF9570FF)
+    thumbColor: Color = Color(0xFF9570FF)
 ) {
+    val currentProgress =
+        viewModel.currentPosition.floatValue / viewModel.totalDuration.value.toFloat()
+
     Box(modifier = modifier) {
         Canvas(modifier = Modifier
             .fillMaxWidth()
@@ -49,8 +52,16 @@ private fun AudioBookSlider(
                     val position = change.position.x
                     val width = size.width
                     val newProgress = (position / width).coerceIn(0f, 1f)
-                    onValueChange(newProgress)
+                    val newPosition = (newProgress * viewModel.totalDuration.intValue).toInt()
+                    viewModel.seekToPosition(newPosition)
                 }
+                detectTapGestures { tapOffset ->
+                    val width = size.width
+                    val newProgress = (tapOffset.x / width).coerceIn(0f, 1f)
+                    val newPosition = (newProgress * viewModel.totalDuration.intValue).toInt()
+                    viewModel.seekToPosition(newPosition)
+                }
+
             }) {
             val canvasWidth = size.width
             val canvasHeight = size.height
@@ -67,7 +78,7 @@ private fun AudioBookSlider(
             drawRoundRect(
                 color = progressColor,
                 size = androidx.compose.ui.geometry.Size(
-                    width = canvasWidth * progress, height = trackHeight
+                    width = canvasWidth * currentProgress, height = trackHeight
                 ),
                 topLeft = Offset(0f, (canvasHeight - trackHeight) / 2),
                 cornerRadius = CornerRadius(trackHeight / 2, trackHeight / 2)
@@ -75,8 +86,8 @@ private fun AudioBookSlider(
 
             // Draw the chapter markers
             chapters.forEach { chapter ->
-                val markerX = canvasWidth * chapter.startTime
-                val markerColor = if (chapter.startTime <= progress) {
+                val markerX = canvasWidth * chapter.startPosition
+                val markerColor = if (chapter.startPosition <= currentProgress) {
                     trackedChapterMarkerColor
                 } else {
                     untrackedChapterMarkerColor
@@ -88,8 +99,7 @@ private fun AudioBookSlider(
                 )
             }
 
-            // Draw the thumb as a circle
-            val thumbX = canvasWidth * progress
+            val thumbX = canvasWidth * currentProgress
             drawCircle(
                 color = thumbColor, radius = thumbRadius, center = Offset(thumbX, canvasHeight / 2)
             )
@@ -99,11 +109,8 @@ private fun AudioBookSlider(
 
 
 @Composable
-fun AudioSlider(isLightMode: MutableState<Boolean>, currentProgress: MutableState<Float>) {
-    val chapters = listOf(
-        Chapter(0.1f), Chapter(0.5f), Chapter(0.7f), Chapter(0.9f)
-    )
-
+fun AudioSlider(mainViewModel: MainViewModel) {
+    val chapters = mainViewModel.currentChapter.value.subTitles
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -112,12 +119,8 @@ fun AudioSlider(isLightMode: MutableState<Boolean>, currentProgress: MutableStat
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         AudioBookSlider(
-            isLightMode = isLightMode.value,
-            progress = currentProgress.value,
+            mainViewModel,
             chapters = chapters,
-            onValueChange = { newProgress ->
-                currentProgress.value = newProgress
-            },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp)
