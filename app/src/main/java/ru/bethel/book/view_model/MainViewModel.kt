@@ -1,6 +1,5 @@
 package ru.bethel.book.view_model
 
-import android.content.Context
 import android.media.MediaPlayer
 import android.util.Log
 import androidx.compose.runtime.mutableFloatStateOf
@@ -15,7 +14,6 @@ import ru.bethel.domain.model.BookHead
 import ru.bethel.domain.model.Chapter
 import ru.bethel.domain.model.newTestament
 import ru.bethel.domain.model.oldTestament
-import ru.bethel.domain.model.ui.AudioData
 
 private const val TAG = "url"
 
@@ -26,7 +24,7 @@ class MainViewModel : ViewModel() {
     val currentBook = mutableStateOf<BookHead>(newTestament.first())
     val currentChapter = mutableStateOf<Chapter>(currentBook.value.chapters.first())
 
-    val bibleBooksList = mutableListOf<BookHead>().apply {
+    private val bibleBooksList = mutableListOf<BookHead>().apply {
         addAll(oldTestament)
         addAll(newTestament)
     }
@@ -60,7 +58,7 @@ class MainViewModel : ViewModel() {
                 currentBook.value = bibleBooksList[currentBookIndex + 1]
                 currentChapter.value = currentBook.value.chapters.first()
             }
-        } else if(currentChapterIndex == 0) {
+        } else if (currentChapterIndex == 0) {
             // first chapter of the book
             // move to previous book
             val currentBookIndex = bibleBooksList.indexOf(currentBook.value)

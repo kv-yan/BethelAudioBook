@@ -1,5 +1,6 @@
 package ru.bethel.book.ui.items
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -20,17 +21,24 @@ import ru.bethel.book.ui.theme.darkSecondaryTextColor
 import ru.bethel.book.ui.theme.lightIconColor
 import ru.bethel.book.ui.theme.lightPrimaryTextColor
 import ru.bethel.book.ui.theme.lightSecondaryTextColor
+import ru.bethel.domain.model.SubTitle
 
 @Composable
-fun ChapterColumnItem(isLightMode: MutableState<Boolean>, isNowPlaying: Boolean) {
+fun ChapterColumnItem(
+    isLightMode: MutableState<Boolean>,
+    isNowPlaying: Boolean,
+    subTitle: SubTitle,
+    onItemCLick: () -> Unit
+) {
 
     Row(
         modifier = Modifier
             .fillMaxWidth()
+            .clickable { onItemCLick() }
             .padding(top = 9.dp, bottom = 9.dp, start = 8.dp)
     ) {
         Text(
-            text = "1․ Մոգերի երկրպագությունը",
+            text = subTitle.startEndRange,
             color = if (isLightMode.value) lightPrimaryTextColor else darkPrimaryTextColor
         )
         Spacer(modifier = Modifier.width(16.dp))
@@ -46,7 +54,7 @@ fun ChapterColumnItem(isLightMode: MutableState<Boolean>, isNowPlaying: Boolean)
             }
 
             Text(
-                text = "0:00-3:29",
+                text = subTitle.startEndRange,
                 color = if (isLightMode.value) lightSecondaryTextColor else darkSecondaryTextColor
             )
         }

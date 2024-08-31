@@ -163,14 +163,34 @@ private fun MainContent(mainViewModel: MainViewModel, isLightMode: MutableState<
                 item {
                     Text(
                         text = "${mainViewModel.currentBook.value.name} , ${currentChapter.title} ",
-                        color = if (isLightMode.value) Color(0xFF1A1A1A) else Color(0xFFFAFAFA)
+                        color = if (isLightMode.value) Color(0xFF1A1A1A) else Color(0xFFFAFAFA),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 8.dp)
+
                     )
                 }
 
                 itemsIndexed(currentChapter.subTitles) { index, item ->
+                    val currentPosition = mainViewModel.currentPosition.floatValue.toInt()
+
+                    // Check if this is the last item
+                    val isLastItem = index == currentChapter.subTitles.size - 1
+
+                    // Determine if the current subtitle is playing
+                    val isNowPlaying = if (isLastItem) {
+                        currentPosition >= item.startTime // If it's the last item, check if the position is at or beyond the start time
+                    } else {
+                        val nextItem = currentChapter.subTitles.getOrNull(index + 1)
+                        currentPosition in item.startTime until (nextItem?.startTime
+                            ?: item.startTime)
+                    }
+
                     ChapterColumnItem(
-                        isLightMode, isNowPlaying = index == 1
-                    )
+                        isLightMode, isNowPlaying = isNowPlaying, subTitle = item
+                    ) {
+                        mainViewModel.seekToPosition(item.startTime)
+                    }
                 }
             }
         }
