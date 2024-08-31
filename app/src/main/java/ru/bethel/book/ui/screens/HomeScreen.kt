@@ -119,8 +119,7 @@ fun HomeScreen(isLightMode: MutableState<Boolean>, mainViewModel: MainViewModel)
         } else {
             Box(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .background(Color.Black.copy(alpha = 0.5f)),
+                    .fillMaxSize(),
                 contentAlignment = Center
             ) {
                 CircularProgressIndicator(
@@ -165,7 +164,10 @@ private fun MainContent(mainViewModel: MainViewModel, isLightMode: MutableState<
                     .padding(start = 12.dp, end = 22.dp, top = 19.dp, bottom = 21.dp)
             ) {
                 item {
-                    Text(text = "${mainViewModel.currentBook.value.title} , ${currentChapter.title} ")
+                    Text(
+                        text = "${mainViewModel.currentBook.value.name} , ${currentChapter.title} ",
+                        color = if (isLightMode.value) Color(0xFF1A1A1A) else Color(0xFFFAFAFA)
+                    )
                 }
 
                 itemsIndexed(currentChapter.subTitles) { index, item ->
@@ -187,8 +189,12 @@ private fun MainContent(mainViewModel: MainViewModel, isLightMode: MutableState<
                     mainViewModel.pause()
                 }
             },
-            onNextChapterClick = {},
-            onPrevChapterClick = {},
+            onNextChapterClick = {
+                mainViewModel.onNextChapter()
+            },
+            onPrevChapterClick = {
+                mainViewModel.onPreviousChapter()
+            },
             onNext10SecClick = { mainViewModel.skipForward10Seconds() },
             onPrev10SecClick = { mainViewModel.skipBackward10Seconds() })
         Spacer(modifier = Modifier.height(58.dp))

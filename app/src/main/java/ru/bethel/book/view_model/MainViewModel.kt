@@ -22,6 +22,52 @@ class MainViewModel : ViewModel() {
     val currentBook = mutableStateOf<BookHead>(newTestament.first())
     val currentChapter = mutableStateOf<Chapter>(currentBook.value.chapters.first())
 
+    val bibleBooksList = mutableListOf<BookHead>().apply {
+        addAll(oldTestament)
+        addAll(newTestament)
+    }
+
+    fun onNextChapter() {
+        val currentChapterIndex = currentBook.value.chapters.indexOf(currentChapter.value)
+        if (currentChapterIndex < currentBook.value.chapters.size - 1) {
+            // next chapter exists, update currentChapter
+            currentChapter.value = currentBook.value.chapters[currentChapterIndex + 1]
+        } else if (currentChapterIndex == currentBook.value.chapters.size - 1) {
+            // last chapter of the book
+            // move to next book
+            val currentBookIndex = bibleBooksList.indexOf(currentBook.value)
+            if (currentBookIndex < bibleBooksList.size - 1) {
+                currentBook.value = bibleBooksList[currentBookIndex + 1]
+                currentChapter.value = currentBook.value.chapters.first()
+            }
+        }
+    }
+
+    fun onPreviousChapter() {
+        val currentChapterIndex = currentBook.value.chapters.indexOf(currentChapter.value)
+        if (currentChapterIndex != 0 && (currentChapterIndex < currentBook.value.chapters.size - 1)) {
+            // next chapter exists, update currentChapter
+            currentChapter.value = currentBook.value.chapters[currentChapterIndex - 1]
+        } else if (currentChapterIndex == currentBook.value.chapters.size - 1) {
+            // last chapter of the book
+            // move to next book
+            val currentBookIndex = bibleBooksList.indexOf(currentBook.value)
+            if (currentBookIndex < bibleBooksList.size - 1) {
+                currentBook.value = bibleBooksList[currentBookIndex + 1]
+                currentChapter.value = currentBook.value.chapters.first()
+            }
+        } else if(currentChapterIndex == 0) {
+            // first chapter of the book
+            // move to previous book
+            val currentBookIndex = bibleBooksList.indexOf(currentBook.value)
+            if (currentBookIndex > 0) {
+                currentBook.value = bibleBooksList[currentBookIndex - 1]
+                currentChapter.value = currentBook.value.chapters.last()
+            }
+
+        }
+    }
+
     var mediaPlayer: MediaPlayer? = null
     val isPlaying = mutableStateOf(false)
     private val audioData = mutableStateOf(AudioData("0:00", "0:00"))
@@ -37,8 +83,7 @@ class MainViewModel : ViewModel() {
             setOnPreparedListener {
                 totalDuration.value = it.duration
                 audioData.value = AudioData(
-                    currentSeconds = formatTime(0),
-                    totalSeconds = formatTime(it.duration / 1000)
+                    currentSeconds = formatTime(0), totalSeconds = formatTime(it.duration / 1000)
                 )
                 isLoadedMP3.value = true
                 startUpdatingCurrentTime()
