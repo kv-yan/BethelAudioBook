@@ -1,5 +1,6 @@
 package ru.bethel.book
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -18,19 +19,19 @@ import ru.bethel.book.ui.drawer.DrawerLayout
 import ru.bethel.book.ui.theme.darkGradient
 import ru.bethel.book.ui.theme.lightGradient
 import ru.bethel.book.view_model.MainViewModel
+import ru.bethel.domain.model.BookHead
+import ru.bethel.domain.model.newTestament
+import ru.bethel.domain.model.oldTestament
 
 class MainActivity : ComponentActivity() {
-    var mainViewModel: MainViewModel? = null
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-
         setContent {
             val isLightMode = remember { mutableStateOf(false) }
             val isShowingDrawer = remember { mutableStateOf(true) }
-            mainViewModel = koinViewModel<MainViewModel>()
+            val mainViewModel = koinViewModel<MainViewModel>()
             FullScreenApp(isLightMode = isLightMode, isDrawerOpened = isShowingDrawer)
 
             Box(
@@ -39,7 +40,7 @@ class MainActivity : ComponentActivity() {
                     .background(if (isLightMode.value) lightGradient else darkGradient)
             ) {
                 DrawerLayout(
-                    mainViewModel = mainViewModel!!,
+                    mainViewModel = mainViewModel,
                     isLightMode = isLightMode,
                     isShowingDrawer = isShowingDrawer
                 )
