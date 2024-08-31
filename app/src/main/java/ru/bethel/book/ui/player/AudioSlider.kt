@@ -21,11 +21,6 @@ import androidx.compose.ui.unit.dp
 import ru.bethel.book.view_model.MainViewModel
 import ru.bethel.domain.model.SubTitle
 
-
-data class Chapter(
-    val startTime: Float, // normalized start time (0f to 1f)
-)
-
 @Composable
 fun AudioBookSlider(
     viewModel: MainViewModel,

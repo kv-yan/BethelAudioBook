@@ -5,15 +5,18 @@ import android.os.Parcelable
 
 data class SubTitle(
     val title: String,
+    val startPosition: Float,
     val startEndRange: String
 ) : Parcelable {
     constructor(parcel: Parcel) : this(
         parcel.readString() ?: "",
+        parcel.readFloat() ?: 0f,
         parcel.readString() ?: ""
     )
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         parcel.writeString(title)
+        parcel.writeFloat(startPosition)
         parcel.writeString(startEndRange)
     }
 
