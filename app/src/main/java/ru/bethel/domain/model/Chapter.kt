@@ -37,7 +37,8 @@ data class SubTitle(
 }
 
 data class Chapter(
-    val title: String,
+    val shortTitle: String,
+    val fullTitle: String,
     val audioURL: String,
     val subTitles: List<SubTitle>,
     var localPath: String? = null
@@ -45,12 +46,14 @@ data class Chapter(
     constructor(parcel: Parcel) : this(
         parcel.readString() ?: "",
         parcel.readString() ?: "",
+        parcel.readString() ?: "",
         parcel.createTypedArrayList(SubTitle.CREATOR) ?: emptyList(),
         parcel.readString()
     )
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
-        parcel.writeString(title)
+        parcel.writeString(shortTitle)
+        parcel.writeString(fullTitle)
         parcel.writeString(audioURL)
         parcel.writeTypedList(subTitles)
         parcel.writeString(localPath)

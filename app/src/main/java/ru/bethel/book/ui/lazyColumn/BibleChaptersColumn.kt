@@ -1,6 +1,5 @@
 package ru.bethel.book.ui.lazyColumn
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -13,8 +12,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import ru.bethel.book.R
+import ru.bethel.book.ui.theme.darkSecondaryTextColor
+import ru.bethel.book.ui.theme.lightSecondaryTextColor
 import ru.bethel.domain.model.Chapter
 
 @Composable
@@ -35,13 +39,13 @@ fun BibleChaptersColumn(
                     .padding(top = 16.dp)
                     .clickable { onChapterItemClick(chapter) }
                     .fillMaxWidth()
-                    .background(if (isLightMode.value) Color(0xFFF3F3F3) else Color(0xFF010101)),
             ) {
                 Text(
-                    text = chapter.title,
+                    text = chapter.fullTitle,
                     color = if (isLightMode.value) Color(0xFF1A1A1A) else Color(0xFFFAFAFA),
                     fontSize = 12.sp,
-                    modifier = Modifier
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    fontFamily = FontFamily(Font(R.font.montserratarm_regular))
                 )
             }
         }
