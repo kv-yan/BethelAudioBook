@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
+import com.google.accompanist.pager.PagerState
 import com.google.accompanist.pager.rememberPagerState
 
 
@@ -35,10 +36,10 @@ import com.google.accompanist.pager.rememberPagerState
 fun ImagePager(
     images: List<Painter>,
     currentChapterIndex: Int,
-    chapterTitles: List<String>, // List of chapter titles
+    pagerState: PagerState,
+    chapterTitles: List<String>,
     onPageChanged: (Int) -> Unit
 ) {
-    val pagerState = rememberPagerState(initialPage = currentChapterIndex)
     var isFirstOrLastElement by remember { mutableStateOf(true) }
 
     LaunchedEffect(pagerState.currentPage) {
@@ -93,8 +94,14 @@ fun ImagePager(
                 modifier = Modifier
                     .padding(8.dp) // Padding around the text
                     .align(Alignment.TopStart) // Position at the top-left corner
-                    .background(Color.Black.copy(alpha = 0.5f) , shape = RoundedCornerShape(4.dp)) // Semi-transparent background
-                    .padding(horizontal = 8.dp, vertical = 4.dp) // Additional padding for the background
+                    .background(
+                        Color.Black.copy(alpha = 0.5f),
+                        shape = RoundedCornerShape(4.dp)
+                    ) // Semi-transparent background
+                    .padding(
+                        horizontal = 8.dp,
+                        vertical = 4.dp
+                    ) // Additional padding for the background
             )
         }
     }

@@ -2,21 +2,17 @@ package ru.bethel.book.ui.screens
 
 
 import android.util.Log
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -24,14 +20,16 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment.Companion.Center
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
+import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.accompanist.pager.rememberPagerState
+import kotlinx.coroutines.launch
 import ru.bethel.book.R
 import ru.bethel.book.ui.items.ChapterColumnItem
 import ru.bethel.book.ui.pager.ImagePager
@@ -103,39 +101,29 @@ private const val TAG = "url"
 @Composable
 fun HomeScreen(isLightMode: MutableState<Boolean>, mainViewModel: MainViewModel) {
     val currentChapter by remember { mainViewModel.currentChapter }
-    val isLoadedMP3 by remember { mainViewModel.isLoadedMP3 }
 
-    val context = LocalContext.current
     val audioUrl = currentChapter.audioURL
 
     LaunchedEffect(currentChapter) {
         Log.e(TAG, "HomeScreen: audioUrl $audioUrl")
-        mainViewModel.prepareMediaPlayer(audioUrl)
+        mainViewModel.prepareMediaPlayer()
     }
+    MainContent(mainViewModel = mainViewModel, isLightMode = isLightMode)
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        if (isLoadedMP3) {
-            MainContent(mainViewModel = mainViewModel, isLightMode = isLightMode)
-        } else {
-            Box(
-                modifier = Modifier.fillMaxSize(), contentAlignment = Center
-            ) {
-                CircularProgressIndicator(
-                    modifier = Modifier.size(45.dp),
-                )
-            }
-        }
-    }
 }
 
+@OptIn(ExperimentalPagerApi::class)
 @Composable
 private fun MainContent(mainViewModel: MainViewModel, isLightMode: MutableState<Boolean>) {
     val scrollState = rememberScrollState()
+    val scope = rememberCoroutineScope()
 
     val currentChapter = mainViewModel.currentChapter.value
     val currentBook = mainViewModel.currentBook.value
     val images = currentBook.chapters.map { painterResource(id = R.drawable.ic_chapter) }
     val chapterTitles = currentBook.chapters.map { "${currentBook.fullName} ${it.shortTitle}" }
+    val pagerState = rememberPagerState(initialPage = currentBook.chapters.indexOf(currentChapter))
+
 
     Column(
         modifier = Modifier
@@ -145,6 +133,7 @@ private fun MainContent(mainViewModel: MainViewModel, isLightMode: MutableState<
         ImagePager(
             images = images,
             chapterTitles = chapterTitles,
+            pagerState = pagerState,
             currentChapterIndex = currentBook.chapters.indexOf(currentChapter)
         ) { pageIndex ->
             if (pageIndex > currentBook.chapters.indexOf(currentChapter)) {
@@ -220,8 +209,25 @@ private fun MainContent(mainViewModel: MainViewModel, isLightMode: MutableState<
             },
             onNextChapterClick = {
                 mainViewModel.onNextChapter()
+                scope.launch {
+                    val index = currentBook.chapters.indexOf(currentChapter)
+                    if (index < currentBook.chapters.size - 1) {
+                        pagerState.animateScrollToPage(index + 1)
+                    } else {
+                        pagerState.animateScrollToPage(0)
+                    }
+                }
             },
             onPrevChapterClick = {
+                scope.launch {
+                    val index = currentBook.chapters.indexOf(currentChapter)
+                    if (index == 0) {
+                        val prevBook = mainViewModel.getPreviousBook()
+                        pagerState.animateScrollToPage(prevBook.chapters.size - 1)
+                    } else {
+                        pagerState.animateScrollToPage(index - 1)
+                    }
+                }
                 mainViewModel.onPreviousChapter()
             },
             onNext10SecClick = { mainViewModel.skipForward10Seconds() },

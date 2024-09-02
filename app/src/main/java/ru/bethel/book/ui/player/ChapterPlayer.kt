@@ -8,8 +8,10 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -48,10 +50,10 @@ fun ChapterPlayer(
         mainViewModel = mainViewModel
     )
 
-    BtnSection(isPlaying = isPlaying,
+    BtnSection(mainViewModel = mainViewModel,
+        isPlaying = isPlaying,
         isLightMode = isLightMode,
         currentProgress = currentProgress,
-        currentPosition = player?.currentPosition ?: 0,
         totalDuration = player?.duration ?: 0,
         onPlayPauseClick = { onPlayPauseClick(isPlaying.value) },
         onNextChapterClick = { onNextChapterClick() },
@@ -63,10 +65,10 @@ fun ChapterPlayer(
 
 @Composable
 fun BtnSection(
+    mainViewModel: MainViewModel,
     isPlaying: MutableState<Boolean>,
     isLightMode: MutableState<Boolean>,
     currentProgress: MutableState<Float>,
-    currentPosition: Int,
     totalDuration: Int,
     onPlayPauseClick: (Boolean) -> Unit,
     onNextChapterClick: () -> Unit,
@@ -81,8 +83,7 @@ fun BtnSection(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = formatTime(currentProgress.value.div(1000).toInt()),
-                color = playerPlayedText
+                text = formatTime(currentProgress.value.div(1000).toInt()), color = playerPlayedText
             )
 
             IconButton(onClick = onPrevChapterClick) {
@@ -107,14 +108,19 @@ fun BtnSection(
                     .width(61.dp)
                     .background(color = Color(0xFFFFFFFF), shape = CircleShape)
                     .clickable { onPlayPauseClick(isPlaying.value) }) {
-
-                Icon(
-                    tint = Color(0xFF212114),
-                    painter = if (isPlaying.value) painterResource(id = R.drawable.ic_player_pause) else painterResource(
-                        id = R.drawable.ic_player_play
-                    ),
-                    contentDescription = null
-                )
+                if (mainViewModel.isLoadedMP3.value) {
+                    Icon(
+                        tint = Color(0xFF212114),
+                        painter = if (isPlaying.value) painterResource(id = R.drawable.ic_player_pause) else painterResource(
+                            id = R.drawable.ic_player_play
+                        ),
+                        contentDescription = null
+                    )
+                } else {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(24.dp), color = Color(0xFF212114)
+                    )
+                }
             }
 
             IconButton(onClick = onNext10SecClick) {

@@ -1,5 +1,6 @@
 package ru.bethel.book.view_model
 
+import android.content.Context
 import android.media.MediaPlayer
 import android.util.Log
 import androidx.compose.runtime.mutableFloatStateOf
@@ -7,17 +8,24 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import ru.bethel.domain.model.BookHead
 import ru.bethel.domain.model.Chapter
 import ru.bethel.domain.model.newTestament
 import ru.bethel.domain.model.oldTestament
+import java.io.BufferedInputStream
+import java.io.File
+import java.io.FileOutputStream
+import java.net.HttpURLConnection
+import java.net.URL
 
 private const val TAG = "url"
 
-class MainViewModel : ViewModel() {
+class MainViewModel(private val context: Context) : ViewModel() {
 
     private var inactivityJob: Job? = null
 
@@ -74,32 +82,71 @@ class MainViewModel : ViewModel() {
     val isPlaying = mutableStateOf(false)
     val currentPosition = mutableFloatStateOf(0f)
     val totalDuration = mutableIntStateOf(0)
-
     val isLoadedMP3 = mutableStateOf(false)
 
-    fun prepareMediaPlayer(audioUrl: String) {
+    fun prepareMediaPlayer() {
+        val chapter = currentChapter.value
+        val fileName = "${chapter.bookIndex}_${chapter.chapterIndex}.mp3"
+        val file = File(context.getExternalFilesDir(null), fileName)
+
+        if (file.exists()) {
+            // Load from local storage
+            prepareMediaPlayerFromFile(file.path)
+            Log.e(TAG, "prepareMediaPlayer: loaded from local")
+        } else {
+            // Download from server and then load
+            downloadFile(chapter.audioURL, file) {
+                prepareMediaPlayerFromFile(file.path)
+            }
+        }
+    }
+
+    private fun prepareMediaPlayerFromFile(filePath: String) {
         resetMediaPlayer()
         mediaPlayer = MediaPlayer().apply {
-            setDataSource(audioUrl)
+            setDataSource(filePath)
             setOnPreparedListener {
                 totalDuration.intValue = it.duration
                 isLoadedMP3.value = true
                 startUpdatingCurrentTime()
             }
             setOnCompletionListener {
-                // Reset player to the start when the MP3 ends
                 it.seekTo(0)
                 this@MainViewModel.currentPosition.value = 0f
                 this@MainViewModel.isPlaying.value = false
-
-                // Start inactivity timer for chapter change
                 startInactivityTimer()
             }
             setOnErrorListener { _, _, _ ->
-                // Error handling...
                 true
             }
             prepareAsync()
+        }
+    }
+
+    private fun downloadFile(url: String, file: File, onDownloadComplete: () -> Unit) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val urlConnection = URL(url).openConnection() as HttpURLConnection
+                val inputStream = BufferedInputStream(urlConnection.inputStream)
+                val outputStream = FileOutputStream(file)
+
+                val buffer = ByteArray(1024)
+                var bytesRead: Int
+                while (inputStream.read(buffer).also { bytesRead = it } != -1) {
+                    outputStream.write(buffer, 0, bytesRead)
+                }
+                outputStream.close()
+                inputStream.close()
+                urlConnection.disconnect()
+
+                // Notify that the download is complete
+                withContext(Dispatchers.Main) {
+                    onDownloadComplete()
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                // Handle the error appropriately, e.g., show a notification or log it
+            }
         }
     }
 
@@ -117,8 +164,8 @@ class MainViewModel : ViewModel() {
         isPlaying.value = false
         currentPosition.value = 0f
         totalDuration.value = 0
-        isLoadedMP3.value = false // Reset MP3 load status
-        inactivityJob?.cancel() // Cancel inactivity timer when resetting
+        isLoadedMP3.value = false
+        inactivityJob?.cancel()
     }
 
     private fun startUpdatingCurrentTime() {
@@ -139,7 +186,7 @@ class MainViewModel : ViewModel() {
             if (!it.isPlaying) {
                 it.start()
                 isPlaying.value = true
-                inactivityJob?.cancel() // Cancel inactivity timer when resetting
+                inactivityJob?.cancel()
             }
         } ?: Log.e(TAG, "play: MediaPlayer not initialized")
     }
@@ -149,7 +196,7 @@ class MainViewModel : ViewModel() {
             if (it.isPlaying) {
                 it.pause()
                 isPlaying.value = false
-                inactivityJob?.cancel() // Cancel inactivity timer when resetting
+                inactivityJob?.cancel()
             }
         } ?: Log.e(TAG, "pause: MediaPlayer not initialized")
     }
@@ -180,7 +227,7 @@ class MainViewModel : ViewModel() {
         super.onCleared()
         mediaPlayer?.release()
         mediaPlayer = null
-        inactivityJob?.cancel() // Cancel inactivity timer when resetting
+        inactivityJob?.cancel()
     }
 
     fun getChaptersToDownload(): List<Chapter> {
@@ -192,4 +239,9 @@ class MainViewModel : ViewModel() {
         }
         return chaptersToDownload
     }
+
+    fun getPreviousBook(): BookHead {
+        return bibleBooksList[bibleBooksList.indexOf(currentBook.value) - 1]
+    }
+
 }
