@@ -46,7 +46,8 @@ fun DrawerBookScreen(
     isLightMode: MutableState<Boolean>,
     state: DrawerState,
     scope: CoroutineScope,
-    bookUiType: MutableState<BooksUiType>
+    bookUiType: MutableState<BooksUiType> ,
+    onBookItemClick: (BookHead) -> Unit
 ) {
     val verticalScrollState = rememberScrollState()
     Column(
@@ -76,10 +77,12 @@ fun DrawerBookScreen(
 
         BibleHeader(isLightMode = isLightMode, title = "Հին կտակարան")
 
+/*
         val onBookItemClick: (BookHead) -> Unit = { item ->
             mainViewModel.currentBook.value = item
             navController.navigate(DrawerScreen.CHAPTER.route)
         }
+*/
 
         when (bookUiType.value) {
             BooksUiType.GRID -> {

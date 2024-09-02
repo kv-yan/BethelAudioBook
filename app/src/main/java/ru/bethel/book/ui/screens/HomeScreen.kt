@@ -28,6 +28,7 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.accompanist.pager.PagerState
 import kotlinx.coroutines.launch
 import ru.bethel.book.R
 import ru.bethel.book.ui.items.ChapterColumnItem
@@ -53,7 +54,7 @@ fun HomeScreen(isLightMode: MutableState<Boolean>, mainViewModel: MainViewModel)
 
 }
 
-@OptIn(ExperimentalPagerApi::class, ExperimentalFoundationApi::class)
+@OptIn(ExperimentalPagerApi::class,)
 @Composable
 private fun MainContent(mainViewModel: MainViewModel, isLightMode: MutableState<Boolean>) {
     val scrollState = rememberScrollState()
@@ -63,13 +64,12 @@ private fun MainContent(mainViewModel: MainViewModel, isLightMode: MutableState<
     val currentBook = mainViewModel.currentBook.value
     val images = currentBook.chapters.map { painterResource(id = R.drawable.ic_chapter) }
     val chapterTitles = currentBook.chapters.map { "${currentBook.fullName} ${it.shortTitle}" }
-    // Key the PagerState to currentBook to ensure it resets when the book changes
     val pagerState = remember(currentBook) {
-        com.google.accompanist.pager.PagerState(
-            currentPage = currentBook.chapters.indexOf(
-                currentChapter
-            )
-        )
+        try {
+            PagerState(currentPage = currentBook.chapters.indexOf(currentChapter))
+        } catch (e : IndexOutOfBoundsException) {
+            PagerState()
+        }
     }
 
 

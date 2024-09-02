@@ -18,6 +18,9 @@ import kotlinx.coroutines.CoroutineScope
 import ru.bethel.book.ui.screens.drawer.DrawerBookScreen
 import ru.bethel.book.ui.screens.drawer.DrawerChapterScreen
 import ru.bethel.book.view_model.MainViewModel
+import ru.bethel.domain.model.BookHead
+import ru.bethel.domain.model.Chapter
+import ru.bethel.domain.model.oldTestament
 import ru.bethel.domain.model.ui.BooksUiType
 import ru.bethel.domain.model.ui.drawer.DrawerScreen
 
@@ -34,6 +37,8 @@ fun DrawerContent(
     val bookUiType = remember {
         mutableStateOf(BooksUiType.GRID)
     }
+
+    val selectedBook = remember { mutableStateOf<BookHead>(oldTestament.first()) }
 
 
     Surface(
@@ -54,7 +59,11 @@ fun DrawerContent(
                     scope = scope,
                     mainViewModel = mainViewModel,
                     navController = chaptersNavController,
-                    bookUiType = bookUiType
+                    bookUiType = bookUiType ,
+                    onBookItemClick = {
+                        selectedBook.value = it
+                        chaptersNavController.navigate(DrawerScreen.CHAPTER.route)
+                    }
                 )
             }
 
@@ -69,6 +78,7 @@ fun DrawerContent(
             ) {
                 DrawerChapterScreen(
                     mainViewModel = mainViewModel,
+                    currentBook = selectedBook,
                     navController = chaptersNavController,
                     isLightMode = isLightMode,
                     drawerState = state,
