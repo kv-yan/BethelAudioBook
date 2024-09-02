@@ -1,5 +1,7 @@
 package ru.bethel.book.ui.pager
 
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -56,6 +58,11 @@ fun ImagePager(
             isFirstOrLastElement = page == 0 || page == images.size - 1
         }
 
+        val scale by animateFloatAsState(
+            targetValue = if (isCurrentPage) 1f else 0.85f,
+            animationSpec = tween(durationMillis = 150), label = ""
+        )
+
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -64,8 +71,8 @@ fun ImagePager(
                     val offset = pageOffset.toDp() * 0.2f
 
                     translationX = if (isCurrentPage) 0f else -offset.toPx()
-                    scaleX = if (isCurrentPage) 1f else 0.85f
-                    scaleY = if (isCurrentPage) 1f else 0.85f
+                    scaleX = scale
+                    scaleY = scale
                 }
         ) {
             Card(
