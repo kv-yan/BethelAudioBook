@@ -41,6 +41,7 @@ class DownloadService : Service() {
         createNotificationChannel()
     }
 
+/*
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         startForegroundService()
         val chapters: List<Chapter> = intent?.getParcelableArrayListExtra("CHAPTERS") ?: emptyList()
@@ -49,6 +50,7 @@ class DownloadService : Service() {
         }
         return START_STICKY
     }
+*/
 
     override fun onBind(intent: Intent?): IBinder? {
         return null
@@ -73,6 +75,7 @@ class DownloadService : Service() {
         }
     }
 
+/*
     private fun startForegroundService() {
         notificationManager = NotificationManagerCompat.from(this)
         notificationBuilder =
@@ -82,6 +85,7 @@ class DownloadService : Service() {
 
         startForeground(notificationId, notificationBuilder.build())
     }
+*/
 
     private suspend fun downloadMp3Files(chapters: List<Chapter>) {
         val totalFiles = chapters.size
@@ -138,4 +142,25 @@ class DownloadService : Service() {
         }
         notificationManager.notify(notificationId, notificationBuilder.build())
     }
+
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        startForegroundService()
+        // Other logic here
+        return START_STICKY
+    }
+
+    private fun startForegroundService() {
+        notificationManager = NotificationManagerCompat.from(this)
+        notificationBuilder =
+            NotificationCompat.Builder(this, channelId)
+                .setContentTitle("Downloading MP3 files")
+                .setSmallIcon(R.drawable.ic_download)
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setOnlyAlertOnce(true)
+                .setCategory(NotificationCompat.CATEGORY_PROGRESS)
+                .setOngoing(true)
+
+        startForeground(notificationId, notificationBuilder.build())
+    }
+
 }

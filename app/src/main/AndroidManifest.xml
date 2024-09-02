@@ -35,7 +35,6 @@
             android:enabled="true"
             android:exported="false"
             android:icon="@drawable/ic_download"
-            android:foregroundServiceType="remoteMessaging"
             android:label="Download"
             tools:ignore="ForegroundServicePermission" />
 
