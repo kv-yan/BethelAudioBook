@@ -35,7 +35,6 @@ import com.google.accompanist.pager.rememberPagerState
 @Composable
 fun ImagePager(
     images: List<Painter>,
-    currentChapterIndex: Int,
     pagerState: PagerState,
     chapterTitles: List<String>,
     onPageChanged: (Int) -> Unit

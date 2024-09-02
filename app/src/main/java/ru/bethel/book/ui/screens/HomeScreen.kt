@@ -1,7 +1,7 @@
 package ru.bethel.book.ui.screens
 
-
 import android.util.Log
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -28,7 +28,6 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.pager.ExperimentalPagerApi
-import com.google.accompanist.pager.rememberPagerState
 import kotlinx.coroutines.launch
 import ru.bethel.book.R
 import ru.bethel.book.ui.items.ChapterColumnItem
@@ -37,64 +36,6 @@ import ru.bethel.book.ui.player.ChapterPlayer
 import ru.bethel.book.ui.theme.dark_subTitlesBackgroundColor
 import ru.bethel.book.ui.theme.light_subTitlesBackgroundColor
 import ru.bethel.book.view_model.MainViewModel
-
-
-/*
-@Composable
-fun HomeScreen(isLightMode: MutableState<Boolean>, mainViewModel: MainViewModel) {
-    val currentChapter = mainViewModel.currentChapter.value
-    val currentBook = mainViewModel.currentBook.value
-    val images = mutableListOf<Painter>()
-
-    val audioUrl = currentChapter.audioURL
-
-    currentBook.chapters.forEach { chapter ->
-        images.add(painterResource(id = R.drawable.ic_chapter))
-    }
-
-    val currentProgress = remember { mutableFloatStateOf(0.5f) }
-    val scrollState = rememberScrollState()
-
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .verticalScroll(state = scrollState)
-    ) {
-        ImagePager(images = images)
-
-        Spacer(modifier = Modifier.height(48.dp))
-
-        Surface(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 24.dp),
-            color = if (isLightMode.value) light_subTitlesBackgroundColor else dark_subTitlesBackgroundColor,
-            shape = RoundedCornerShape(25.dp)
-
-        ) {
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .heightIn(min = 10.dp, max = 1000.dp)
-                    .padding(start = 12.dp, end = 22.dp, top = 19.dp, bottom = 21.dp)
-            ) {
-                itemsIndexed(currentChapter.subTitles) { index, item ->
-                    ChapterColumnItem(
-                        isLightMode, isNowPlaying = index == 1
-                    )
-                }
-            }
-
-        }
-
-
-        ChapterPlayer(isLightMode = isLightMode, currentProgress = currentProgress)
-
-        Spacer(modifier = Modifier.height(58.dp))
-    }
-}
-*/
-
 
 private const val TAG = "url"
 
@@ -112,7 +53,7 @@ fun HomeScreen(isLightMode: MutableState<Boolean>, mainViewModel: MainViewModel)
 
 }
 
-@OptIn(ExperimentalPagerApi::class)
+@OptIn(ExperimentalPagerApi::class, ExperimentalFoundationApi::class)
 @Composable
 private fun MainContent(mainViewModel: MainViewModel, isLightMode: MutableState<Boolean>) {
     val scrollState = rememberScrollState()
@@ -122,7 +63,14 @@ private fun MainContent(mainViewModel: MainViewModel, isLightMode: MutableState<
     val currentBook = mainViewModel.currentBook.value
     val images = currentBook.chapters.map { painterResource(id = R.drawable.ic_chapter) }
     val chapterTitles = currentBook.chapters.map { "${currentBook.fullName} ${it.shortTitle}" }
-    val pagerState = rememberPagerState(initialPage = currentBook.chapters.indexOf(currentChapter))
+    // Key the PagerState to currentBook to ensure it resets when the book changes
+    val pagerState = remember(currentBook) {
+        com.google.accompanist.pager.PagerState(
+            currentPage = currentBook.chapters.indexOf(
+                currentChapter
+            )
+        )
+    }
 
 
     Column(
@@ -134,7 +82,6 @@ private fun MainContent(mainViewModel: MainViewModel, isLightMode: MutableState<
             images = images,
             chapterTitles = chapterTitles,
             pagerState = pagerState,
-            currentChapterIndex = currentBook.chapters.indexOf(currentChapter)
         ) { pageIndex ->
             if (pageIndex > currentBook.chapters.indexOf(currentChapter)) {
                 mainViewModel.onNextChapter()
@@ -172,7 +119,6 @@ private fun MainContent(mainViewModel: MainViewModel, isLightMode: MutableState<
                 itemsIndexed(currentChapter.subTitles) { index, item ->
                     val currentPosition = mainViewModel.currentPosition.floatValue.toInt()
 
-                    // Check if this is the last item
                     val isLastItem = index == currentChapter.subTitles.size - 1
 
                     // Determine if the current subtitle is playing
@@ -223,7 +169,9 @@ private fun MainContent(mainViewModel: MainViewModel, isLightMode: MutableState<
                     val index = currentBook.chapters.indexOf(currentChapter)
                     if (index == 0) {
                         val prevBook = mainViewModel.getPreviousBook()
-                        pagerState.animateScrollToPage(prevBook.chapters.size - 1)
+                        if (prevBook != null) {
+                            pagerState.animateScrollToPage(prevBook.chapters.size - 1)
+                        }
                     } else {
                         pagerState.animateScrollToPage(index - 1)
                     }
@@ -235,5 +183,4 @@ private fun MainContent(mainViewModel: MainViewModel, isLightMode: MutableState<
 
         Spacer(modifier = Modifier.height(58.dp))
     }
-
 }

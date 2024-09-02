@@ -55,26 +55,17 @@ class MainViewModel(private val context: Context) : ViewModel() {
 
     fun onPreviousChapter() {
         val currentChapterIndex = currentBook.value.chapters.indexOf(currentChapter.value)
-        if (currentChapterIndex != 0 && (currentChapterIndex < currentBook.value.chapters.size - 1)) {
-            // next chapter exists, update currentChapter
+
+        if (currentChapterIndex > 0) {
+            // Previous chapter exists in the current book, update currentChapter
             currentChapter.value = currentBook.value.chapters[currentChapterIndex - 1]
-        } else if (currentChapterIndex == currentBook.value.chapters.size - 1) {
-            // last chapter of the book
-            // move to next book
-            val currentBookIndex = bibleBooksList.indexOf(currentBook.value)
-            if (currentBookIndex < bibleBooksList.size - 1) {
-                currentBook.value = bibleBooksList[currentBookIndex + 1]
-                currentChapter.value = currentBook.value.chapters.first()
-            }
         } else if (currentChapterIndex == 0) {
-            // first chapter of the book
-            // move to previous book
+            // First chapter of the current book, move to the previous book if available
             val currentBookIndex = bibleBooksList.indexOf(currentBook.value)
             if (currentBookIndex > 0) {
                 currentBook.value = bibleBooksList[currentBookIndex - 1]
                 currentChapter.value = currentBook.value.chapters.last()
             }
-
         }
     }
 
@@ -240,8 +231,8 @@ class MainViewModel(private val context: Context) : ViewModel() {
         return chaptersToDownload
     }
 
-    fun getPreviousBook(): BookHead {
-        return bibleBooksList[bibleBooksList.indexOf(currentBook.value) - 1]
+    fun getPreviousBook(): BookHead? {
+        return bibleBooksList.getOrNull(bibleBooksList.indexOf(currentBook.value) - 1)
     }
 
 }
