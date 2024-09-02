@@ -15,11 +15,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import org.koin.androidx.compose.koinViewModel
+import ru.bethel.book.service.DownloadService
 import ru.bethel.book.ui.drawer.DrawerLayout
 import ru.bethel.book.ui.theme.darkGradient
 import ru.bethel.book.ui.theme.lightGradient
 import ru.bethel.book.view_model.MainViewModel
 import ru.bethel.domain.model.BookHead
+import ru.bethel.domain.model.Chapter
 import ru.bethel.domain.model.newTestament
 import ru.bethel.domain.model.oldTestament
 
@@ -33,7 +35,7 @@ class MainActivity : ComponentActivity() {
             val isShowingDrawer = remember { mutableStateOf(true) }
             val mainViewModel = koinViewModel<MainViewModel>()
             FullScreenApp(isLightMode = isLightMode, isDrawerOpened = isShowingDrawer)
-
+            startDownloadService(mainViewModel)
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -47,6 +49,14 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+
+    private fun startDownloadService(mainViewModel: MainViewModel) {
+        val chapters: List<Chapter> = mainViewModel.getChaptersToDownload()
+        val intent = Intent(this, DownloadService::class.java)
+        intent.putParcelableArrayListExtra("CHAPTERS", ArrayList(chapters))
+        startService(intent)
+    }
+
 }
 
 

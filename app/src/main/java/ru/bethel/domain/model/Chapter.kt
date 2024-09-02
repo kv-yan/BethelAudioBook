@@ -41,14 +41,18 @@ data class Chapter(
     val fullTitle: String,
     val audioURL: String,
     val subTitles: List<SubTitle>,
-    var localPath: String? = null
+    var localPath: String? = null,
+    val bookIndex:Int,
+    val chapterIndex:Int
 ) : Parcelable {
     constructor(parcel: Parcel) : this(
         parcel.readString() ?: "",
         parcel.readString() ?: "",
         parcel.readString() ?: "",
         parcel.createTypedArrayList(SubTitle.CREATOR) ?: emptyList(),
-        parcel.readString()
+        parcel.readString(),
+        parcel.readInt(),
+        parcel.readInt()
     )
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
@@ -57,6 +61,8 @@ data class Chapter(
         parcel.writeString(audioURL)
         parcel.writeTypedList(subTitles)
         parcel.writeString(localPath)
+        parcel.writeInt(bookIndex)
+        parcel.writeInt(chapterIndex)
     }
 
     override fun describeContents(): Int = 0

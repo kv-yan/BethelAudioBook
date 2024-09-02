@@ -182,4 +182,14 @@ class MainViewModel : ViewModel() {
         mediaPlayer = null
         inactivityJob?.cancel() // Cancel inactivity timer when resetting
     }
+
+    fun getChaptersToDownload(): List<Chapter> {
+        val chaptersToDownload = mutableListOf<Chapter>()
+        bibleBooksList.forEach { book ->
+            book.chapters.forEach { chapter ->
+                chaptersToDownload.add(chapter)
+            }
+        }
+        return chaptersToDownload
+    }
 }
