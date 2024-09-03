@@ -4,6 +4,8 @@ import android.app.Application
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.GlobalContext.startKoin
 import ru.bethel.book.di.appModule
+import ru.bethel.book.di.dataModule
+import ru.bethel.book.di.domainModule
 
 class MainApplication : Application() {
     override fun onCreate() {
@@ -11,7 +13,7 @@ class MainApplication : Application() {
 
         startKoin {
             androidContext(this@MainApplication)
-            modules(appModule)
+            modules(appModule, dataModule, domainModule)
         }
     }
 }

@@ -8,6 +8,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -20,10 +21,8 @@ import ru.bethel.book.ui.drawer.DrawerLayout
 import ru.bethel.book.ui.theme.darkGradient
 import ru.bethel.book.ui.theme.lightGradient
 import ru.bethel.book.view_model.MainViewModel
-import ru.bethel.domain.model.BookHead
+import ru.bethel.book.view_model.ThemeViewModel
 import ru.bethel.domain.model.Chapter
-import ru.bethel.domain.model.newTestament
-import ru.bethel.domain.model.oldTestament
 
 class MainActivity : ComponentActivity() {
 
@@ -31,9 +30,15 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
-            val isLightMode = remember { mutableStateOf(false) }
             val isShowingDrawer = remember { mutableStateOf(true) }
             val mainViewModel = koinViewModel<MainViewModel>()
+            val themeViewModel = koinViewModel<ThemeViewModel>()
+            val isLightMode = themeViewModel.isLightMode
+
+            LaunchedEffect(isLightMode.value) {
+                themeViewModel.setIsLightTheme(isLightMode.value)
+            }
+
             FullScreenApp(isLightMode = isLightMode, isDrawerOpened = isShowingDrawer)
             startDownloadService(mainViewModel)
             Box(
