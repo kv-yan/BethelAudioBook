@@ -1,7 +1,7 @@
 package ru.bethel.book.ui.drawer
 
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.material3.DrawerState
@@ -19,7 +19,6 @@ import ru.bethel.book.ui.screens.drawer.DrawerBookScreen
 import ru.bethel.book.ui.screens.drawer.DrawerChapterScreen
 import ru.bethel.book.view_model.MainViewModel
 import ru.bethel.domain.model.BookHead
-import ru.bethel.domain.model.Chapter
 import ru.bethel.domain.model.oldTestament
 import ru.bethel.domain.model.ui.BooksUiType
 import ru.bethel.domain.model.ui.drawer.DrawerScreen
@@ -38,7 +37,9 @@ fun DrawerContent(
         mutableStateOf(BooksUiType.GRID)
     }
 
-    val selectedBook = remember { mutableStateOf<BookHead>(oldTestament.first()) }
+    val selectedBook = remember { mutableStateOf(oldTestament.first()) }
+
+    val animationDuration = 250
 
 
     Surface(
@@ -50,16 +51,27 @@ fun DrawerContent(
     ) {
         NavHost(navController = chaptersNavController, startDestination = DrawerScreen.BOOK.route) {
 
-            composable(route = DrawerScreen.BOOK.route, exitTransition = {
-                slideOutHorizontally(targetOffsetX = { -it }) + fadeOut(targetAlpha = 0.3f)
-            }) {
+            // BOOK screen with slide to left when navigating away
+            composable(
+                route = DrawerScreen.BOOK.route,
+                exitTransition = {
+                    slideOutHorizontally(
+                        targetOffsetX = { -it },
+                        animationSpec = tween(durationMillis = animationDuration)
+                    )
+                },
+                popEnterTransition = {
+                    slideInHorizontally(
+                        initialOffsetX = { -it },
+                        animationSpec = tween(durationMillis = animationDuration)
+                    )
+                }
+            ) {
                 DrawerBookScreen(
                     isLightMode = isLightMode,
                     state = state,
                     scope = scope,
-                    mainViewModel = mainViewModel,
-                    navController = chaptersNavController,
-                    bookUiType = bookUiType ,
+                    bookUiType = bookUiType,
                     onBookItemClick = {
                         selectedBook.value = it
                         chaptersNavController.navigate(DrawerScreen.CHAPTER.route)
@@ -67,14 +79,24 @@ fun DrawerContent(
                 )
             }
 
+            // CHAPTER screen with slide to right when navigating forward
             composable(
                 route = DrawerScreen.CHAPTER.route,
                 enterTransition = {
-                    slideInHorizontally(initialOffsetX = { it }) + fadeIn(initialAlpha = 0.3f)
+                    slideInHorizontally(
+                        initialOffsetX = { it },
+                        animationSpec = tween(durationMillis = animationDuration) // Adjust duration here
+                    ) + fadeIn(
+                        initialAlpha = 0.3f,
+                        animationSpec = tween(durationMillis = animationDuration) // Adjust duration here
+                    )
                 },
                 exitTransition = {
-                    slideOutHorizontally(targetOffsetX = { -it }) + fadeOut(targetAlpha = 0.3f)
-                },
+                    slideOutHorizontally(
+                        targetOffsetX = { it },
+                        animationSpec = tween(durationMillis = animationDuration) // Adjust duration here
+                    )
+                }
             ) {
                 DrawerChapterScreen(
                     mainViewModel = mainViewModel,
@@ -84,7 +106,9 @@ fun DrawerContent(
                     drawerState = state,
                     scope = scope,
                     booksUiType = bookUiType
-                )
+                ) {
+                    chaptersNavController.popBackStack()
+                }
             }
         }
 
