@@ -5,15 +5,21 @@ import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 import ru.bethel.book.view_model.MainViewModel
 import ru.bethel.book.view_model.ThemeViewModel
-import ru.bethel.data.ThemeRepoImpl
-import ru.bethel.domain.repo.ThemeRepo
+import ru.bethel.domain.usecase.book.get.GetLastPlayedBookUseCase
+import ru.bethel.domain.usecase.book.get.GetLastPlayedChapterUseCase
+import ru.bethel.domain.usecase.book.set.SetLastPlayedBookUseCase
+import ru.bethel.domain.usecase.book.set.SetLastPlayedChapterUseCase
 import ru.bethel.domain.usecase.theme.GetIsLightThemeUseCase
 import ru.bethel.domain.usecase.theme.SetIsLightThemeUseCase
 
 val appModule = module {
     viewModel<MainViewModel> {
         MainViewModel(
-            context = get<Context>()
+            context = get<Context>(),
+            getLastPlayedBookUseCase = get<GetLastPlayedBookUseCase>(),
+            setLastPlayedBookUseCase = get<SetLastPlayedBookUseCase>(),
+            getLastPlayedChapterUseCase = get<GetLastPlayedChapterUseCase>(),
+            setLastPlayedChapterUseCase = get<SetLastPlayedChapterUseCase>()
         )
     }
 

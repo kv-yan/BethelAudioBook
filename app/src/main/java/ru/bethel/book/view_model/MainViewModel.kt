@@ -17,6 +17,10 @@ import ru.bethel.domain.model.BookHead
 import ru.bethel.domain.model.Chapter
 import ru.bethel.domain.model.newTestament
 import ru.bethel.domain.model.oldTestament
+import ru.bethel.domain.usecase.book.get.GetLastPlayedBookUseCase
+import ru.bethel.domain.usecase.book.get.GetLastPlayedChapterUseCase
+import ru.bethel.domain.usecase.book.set.SetLastPlayedBookUseCase
+import ru.bethel.domain.usecase.book.set.SetLastPlayedChapterUseCase
 import java.io.BufferedInputStream
 import java.io.File
 import java.io.FileOutputStream
@@ -25,12 +29,27 @@ import java.net.URL
 
 private const val TAG = "url"
 
-class MainViewModel(private val context: Context) : ViewModel() {
+class MainViewModel(
+    private val context: Context,
+    private val getLastPlayedChapterUseCase: GetLastPlayedChapterUseCase,
+    private val setLastPlayedChapterUseCase: SetLastPlayedChapterUseCase,
+    private val getLastPlayedBookUseCase: GetLastPlayedBookUseCase,
+    private val setLastPlayedBookUseCase: SetLastPlayedBookUseCase,
+
+    ) : ViewModel() {
 
     private var inactivityJob: Job? = null
 
-    val currentBook = mutableStateOf<BookHead>(newTestament.first())
-    val currentChapter = mutableStateOf<Chapter>(currentBook.value.chapters.first())
+    val currentBook = mutableStateOf<BookHead>(newTestament.first()).apply {
+        viewModelScope.launch {
+            value = getLastPlayedBookUseCase.invoke()
+        }
+    }
+    val currentChapter = mutableStateOf<Chapter>(currentBook.value.chapters.first()).apply {
+        viewModelScope.launch {
+            value = getLastPlayedChapterUseCase.invoke()
+        }
+    }
 
     private val bibleBooksList = mutableListOf<BookHead>().apply {
         addAll(oldTestament)
@@ -233,6 +252,18 @@ class MainViewModel(private val context: Context) : ViewModel() {
 
     fun getPreviousBook(): BookHead? {
         return bibleBooksList.getOrNull(bibleBooksList.indexOf(currentBook.value) - 1)
+    }
+
+    fun setLastPlayedBook(book: BookHead) {
+        viewModelScope.launch(Dispatchers.IO) {
+            setLastPlayedBookUseCase(book)
+        }
+    }
+
+    fun setLastPlayedChapter(chapter: Chapter) {
+        viewModelScope.launch(Dispatchers.IO) {
+            setLastPlayedChapterUseCase(chapter)
+        }
     }
 
 }

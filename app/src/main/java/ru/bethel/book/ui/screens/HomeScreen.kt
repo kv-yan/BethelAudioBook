@@ -47,8 +47,9 @@ fun HomeScreen(isLightMode: MutableState<Boolean>, mainViewModel: MainViewModel)
     val audioUrl = currentChapter.audioURL
 
     LaunchedEffect(currentChapter) {
-        Log.e(TAG, "HomeScreen: audioUrl $audioUrl")
         mainViewModel.prepareMediaPlayer()
+        mainViewModel.setLastPlayedChapter(currentChapter)
+        mainViewModel.setLastPlayedBook(mainViewModel.currentBook.value)
     }
     MainContent(mainViewModel = mainViewModel, isLightMode = isLightMode)
 

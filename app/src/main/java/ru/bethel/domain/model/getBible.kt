@@ -80,3 +80,5 @@ val newTestament = listOf(
     BookHead("Հուդա","Հուդա", (1..1).map { Chapter("$it","Գլուխ $it", "https://www.derekprincearmenia.com/audiofiles/hy/65/$it.mp3", basicSubTitleList, bookIndex = 65 , chapterIndex = it) } ,65),
     BookHead("Հայ","Հայտնություն", (1..22).map { Chapter("$it","Գլուխ $it", "https://www.derekprincearmenia.com/audiofiles/hy/66/$it.mp3", basicSubTitleList , bookIndex = 66 , chapterIndex = it) } ,66)
 )
+
+val bibleBooks = oldTestament + newTestament
