@@ -5,6 +5,9 @@ import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 import ru.bethel.book.view_model.MainViewModel
 import ru.bethel.book.view_model.ThemeViewModel
+import ru.bethel.domain.helpers.BookNavigationHelper
+import ru.bethel.domain.helpers.DownloadHelper
+import ru.bethel.domain.helpers.MediaPlayerHelper
 import ru.bethel.domain.usecase.book.get.GetLastPlayedBookUseCase
 import ru.bethel.domain.usecase.book.get.GetLastPlayedChapterUseCase
 import ru.bethel.domain.usecase.book.set.SetLastPlayedBookUseCase
@@ -17,9 +20,10 @@ val appModule = module {
         MainViewModel(
             context = get<Context>(),
             getLastPlayedBookUseCase = get<GetLastPlayedBookUseCase>(),
-            setLastPlayedBookUseCase = get<SetLastPlayedBookUseCase>(),
             getLastPlayedChapterUseCase = get<GetLastPlayedChapterUseCase>(),
-            setLastPlayedChapterUseCase = get<SetLastPlayedChapterUseCase>()
+            mediaPlayerHelper = get<MediaPlayerHelper>(),
+            downloadHelper = get<DownloadHelper>(),
+            bookNavigationHelper = get<BookNavigationHelper>()
         )
     }
 

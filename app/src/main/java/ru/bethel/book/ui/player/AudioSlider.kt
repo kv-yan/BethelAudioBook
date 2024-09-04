@@ -35,8 +35,7 @@ fun AudioBookSlider(
     thumbRadius: Float = 16f,
     thumbColor: Color = Color(0xFF9570FF)
 ) {
-    val currentProgress =
-        viewModel.currentPosition.floatValue / viewModel.totalDuration.value.toFloat()
+    val currentProgress = viewModel.currentPosition.floatValue / viewModel.totalDuration.value.toFloat()
 
     Box(modifier = modifier) {
         Canvas(modifier = Modifier

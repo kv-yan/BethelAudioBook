@@ -1,7 +1,5 @@
 package ru.bethel.book.ui.screens
 
-import android.util.Log
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -48,14 +46,13 @@ fun HomeScreen(isLightMode: MutableState<Boolean>, mainViewModel: MainViewModel)
 
     LaunchedEffect(currentChapter) {
         mainViewModel.prepareMediaPlayer()
-        mainViewModel.setLastPlayedChapter(currentChapter)
-        mainViewModel.setLastPlayedBook(mainViewModel.currentBook.value)
+        mainViewModel.saveChanges()
     }
     MainContent(mainViewModel = mainViewModel, isLightMode = isLightMode)
 
 }
 
-@OptIn(ExperimentalPagerApi::class,)
+@OptIn(ExperimentalPagerApi::class)
 @Composable
 private fun MainContent(mainViewModel: MainViewModel, isLightMode: MutableState<Boolean>) {
     val scrollState = rememberScrollState()
@@ -68,7 +65,7 @@ private fun MainContent(mainViewModel: MainViewModel, isLightMode: MutableState<
     val pagerState = remember(currentBook) {
         try {
             PagerState(currentPage = currentBook.chapters.indexOf(currentChapter))
-        } catch (e : IndexOutOfBoundsException) {
+        } catch (e: IndexOutOfBoundsException) {
             PagerState()
         }
     }
