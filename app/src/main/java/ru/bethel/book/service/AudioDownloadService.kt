@@ -25,9 +25,8 @@ import java.io.FileOutputStream
 import java.net.HttpURLConnection
 import java.net.URL
 
-private const val TAG = "AudioDownloadService"
-
 class DownloadService : Service() {
+    private val TAG = "AudioDownloadService"
 
     private val job = Job()
     private val coroutineScope = CoroutineScope(Dispatchers.IO + job)
@@ -155,7 +154,7 @@ class DownloadService : Service() {
             NotificationCompat.Builder(this, channelId)
                 .setContentTitle("Downloading MP3 files")
                 .setSmallIcon(R.drawable.ic_download)
-                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setPriority(NotificationCompat.PRIORITY_LOW)
                 .setOnlyAlertOnce(true)
                 .setCategory(NotificationCompat.CATEGORY_PROGRESS)
                 .setOngoing(true)

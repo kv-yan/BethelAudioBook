@@ -10,9 +10,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class MediaPlayerHelper(
-    private val context: Context,
-
-    ) {
+    private val context: Context, ) {
 
     var mediaPlayer: MediaPlayer? = null
     val isPlaying = mutableStateOf(false)

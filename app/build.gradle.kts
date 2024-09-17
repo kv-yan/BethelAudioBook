@@ -78,5 +78,7 @@ dependencies {
     // koin
     implementation(libs.koin.androidx.compose)
 
+    implementation (libs.androidx.media)
+
 
 }

@@ -15,22 +15,22 @@ class BookRepoImpl(context: Context) : BookRepo {
     private val sharedPreferences = context.getSharedPreferences("book", Context.MODE_PRIVATE)
 
     override suspend fun getLastPlayedBook(): BookHead {
-        val index = sharedPreferences.getInt(LAST_PLAYED_BOOK, 1)
-        Log.e(TAG, "getLastPlayedBook: ${bibleBooks.size}")
-        return bibleBooks[index]
+        val index = sharedPreferences.getInt(LAST_PLAYED_BOOK, 0)
+        return bibleBooks.find { it.bookIndex == index } ?: bibleBooks[0]
     }
 
     override suspend fun setLastPlayedBook(book: BookHead) {
-        sharedPreferences.edit().putInt(LAST_PLAYED_BOOK, book.bookIndex - 1).apply()
+        sharedPreferences.edit().putInt(LAST_PLAYED_BOOK, book.bookIndex).apply()
     }
 
     override suspend fun getLastPlayedChapter(): Chapter {
-        val index = sharedPreferences.getInt(LAST_PLAYED_CHAPTER, 1)
+        val index = sharedPreferences.getInt(LAST_PLAYED_CHAPTER, 0)
         Log.e(TAG, "getLastPlayedBook: ${bibleBooks.size}")
-        return bibleBooks[getLastPlayedBook().bookIndex - 1].chapters[index]
+        return getLastPlayedBook().chapters.find { it.chapterIndex == index }
+            ?: getLastPlayedBook().chapters[0]
     }
 
     override suspend fun setLastPlayedChapter(chapter: Chapter) {
-        sharedPreferences.edit().putInt(LAST_PLAYED_CHAPTER, chapter.chapterIndex - 1).apply()
+        sharedPreferences.edit().putInt(LAST_PLAYED_CHAPTER, chapter.chapterIndex).apply()
     }
 }
