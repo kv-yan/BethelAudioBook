@@ -80,7 +80,6 @@ class MediaPlaybackService : Service() {
             .setShowActionsInCompactView(0, 1, 2)
             .setMediaSession(mediaSession.sessionToken)
 
-
         val notification = NotificationCompat.Builder(this, CHANNEL_ID)
             .setSmallIcon(R.drawable.bethel_logo_dark)
             .setLargeIcon(BitmapFactory.decodeResource(resources, R.drawable.bethel_logo_dark))

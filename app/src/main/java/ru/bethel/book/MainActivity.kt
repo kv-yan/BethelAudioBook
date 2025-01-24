@@ -3,11 +3,14 @@ package ru.bethel.book
 import android.Manifest
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.content.ServiceConnection
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.os.IBinder
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -52,7 +55,7 @@ class MainActivity : ComponentActivity() {
             FullScreenApp(isLightMode = isLightMode, isDrawerOpened = isShowingDrawer)
             startDownloadService(mainViewModel)
             createNotificationChannel(this)
-            startMediaPlaybackService(this, MediaPlaybackService.ACTION_PLAY)
+            startMediaPlaybackService(this, MediaPlaybackService.ACTION_PAUSE)
 
             Box(
                 modifier = Modifier
@@ -66,7 +69,9 @@ class MainActivity : ComponentActivity() {
                 )
             }
         }
-    }    fun createNotificationChannel(context: Context) {
+    }
+
+    private fun createNotificationChannel(context: Context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
                 MediaPlaybackService.CHANNEL_ID,
@@ -79,8 +84,6 @@ class MainActivity : ComponentActivity() {
     }
 
 
-
-
     private fun startDownloadService(mainViewModel: MainViewModel) {
         val chapters: List<Chapter> = mainViewModel.getChaptersToDownload()
         val intent = Intent(this, DownloadService::class.java)
@@ -88,7 +91,7 @@ class MainActivity : ComponentActivity() {
         startService(intent)
     }
 
-    fun startMediaPlaybackService(context: Context, action: String) {
+    private fun startMediaPlaybackService(context: Context, action: String) {
         val intent = Intent(context, MediaPlaybackService::class.java).apply {
             this.action = action
         }
@@ -102,54 +105,14 @@ class MainActivity : ComponentActivity() {
 
     private val notificationPermissionRequest = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
-    ) { isGranted ->
-        if (isGranted) {
-            // Permission is granted, you can start the foreground service
-//            startAudioForegroundService()
-        } else {
-            // Handle permission denial
-            Toast.makeText(this, "Notification permission required!", Toast.LENGTH_SHORT).show()
-        }
-    }
+    ) { _ -> }
 
 
     private fun requestNotificationPermission(context: Context) {
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS)
-                != PackageManager.PERMISSION_GRANTED
-            ) {
+            if (ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
                 notificationPermissionRequest.launch(Manifest.permission.POST_NOTIFICATIONS)
-            } else {
-                // Permission already granted
-//                startAudioForegroundService()
             }
-        } else {
-            // For Android versions below 13, start service without notification permission
-//            startAudioForegroundService()
         }
     }
 }
-
-
-@Composable
-fun FullScreenApp(isLightMode: MutableState<Boolean>, isDrawerOpened: MutableState<Boolean>) {
-    val systemUiController = rememberSystemUiController()
-    val useDarkIcons = isLightMode.value
-
-    val topStatusBarColor = if (isDrawerOpened.value) {
-        if (isLightMode.value) Color(0xFFF5F9FB) else Color(0xFF000000)
-    } else {
-        if (isLightMode.value) Color(0xFFFEFBFE) else Color(0xFF000000)
-    }
-    systemUiController.setSystemBarsColor(
-        color = topStatusBarColor, darkIcons = useDarkIcons
-    )
-
-    systemUiController.isStatusBarVisible = true
-    systemUiController.isNavigationBarVisible = true
-    systemUiController.setNavigationBarColor(Color.Black)
-}
-
-
-
